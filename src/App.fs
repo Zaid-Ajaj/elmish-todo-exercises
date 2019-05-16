@@ -166,7 +166,14 @@ let createTodoTextbox state dispatch =
     ] 
   ] 
 
-let renderEditForm (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) = 
+let renderEditForm (todoBeingEdited: TodoBeingEdited) (todo: Todo) (dispatch: Msg -> unit) = 
+  let saveButtonClass = 
+    classList [
+      "button", true 
+      "is-primary", todoBeingEdited.Description <> todo.Description
+      "is-outlined", todoBeingEdited.Description = todo.Description
+    ] 
+  
   div [ Class "box" ] [
     div [ Class "field is-grouped" ] [ 
       div [ Class "control is-expanded" ] [
@@ -177,7 +184,7 @@ let renderEditForm (todoBeingEdited: TodoBeingEdited) (dispatch: Msg -> unit) =
         ]
       ]
       div [ Class "control buttons" ] [
-        button [ Class "button is-primary"; OnClick (fun _ -> dispatch (ApplyEdit (todoBeingEdited.Id)))  ] [
+        button [ saveButtonClass; OnClick (fun _ -> dispatch (ApplyEdit (todoBeingEdited.Id)))  ] [
           i [ Class "fa fa-save" ] [ ] 
         ] 
         button [ Class "button is-warning"; OnClick (fun _ -> dispatch (CancelEdit (todoBeingEdited.Id))) ] [ 
@@ -251,8 +258,10 @@ let render (state: State) (dispatch: Msg -> unit) =
     div [ Class "content" ] [ 
       for todo in filteredTodos -> 
         match beingEdited todo with 
-        | Some todoBeingEdited -> renderEditForm todoBeingEdited dispatch
-        | None -> renderTodo todo dispatch
+        | Some todoBeingEdited -> 
+            renderEditForm todoBeingEdited todo dispatch
+        | None -> 
+            renderTodo todo dispatch
     ]
   ]
 
